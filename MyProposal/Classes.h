@@ -15,7 +15,7 @@ public: //TODO pasar los atributos a private
   CInternalNode *childs[2];
 
   CInternalNode() {
-    median = 0.0f;
+    median = "0.0"//0.0f;
     childs[0] = childs[1] = nullptr;
   }
 
