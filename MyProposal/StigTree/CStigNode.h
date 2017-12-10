@@ -1,6 +1,7 @@
 #include <vector>
 using namespace std;
 
+
 class CStigNode {
 public: //TODO pasar los atributos a private
   int idxData;

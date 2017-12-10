@@ -4,20 +4,46 @@
 #include <algorithm> 
 #include "CStigTree.h"
 #include "extend.h"
+#include "utils.hpp"
 #include <iostream>
 using namespace std;
 
-#define BSZ 4026//100
+#define BSZ 1024//100
 #define Tpair pair<int, float>
 
 CStigTree ::  CStigTree(int iDimensions){
   root = nullptr;
   dimensions = iDimensions;
+  string name = "files/YearPredictionMSD.txt";
+  ifstream file(name);
+  allRegisters = readCSV(file, false);
+  /*for(int i =0;i<10;i++){
+        ///allRegisters[registro][columna]
+        cout<<allRegisters[i][0]<<"["<<i<<"]";
+    }*/
+}
+
+vector<Tpair> CStigTree :: load (vector<int> idxRecords, int currentdim){
+  vector<Tpair> res(0);
+  string::size_type sz;
+  float value;
+  if(currentdim == 1){
+    for(int i =0;i<allRegisters.size();i++){
+        value = stof(allRegisters[i][0],&sz);
+        res.push_back(make_pair(i,value));
+    } 
+  }else{
+    for(int k =0;k<idxRecords.size();k++){
+      value = stof(allRegisters[idxRecords[k]][currentdim],&sz);
+      res.push_back(make_pair(idxRecords[k],value));
+    }
+  }
+  return res;
 }
 
   
 void CStigTree :: createIndex(CStigNode* node, int currentdim){
-  cout<<"\n[create dim "<<currentdim<<"]";
+  cout<<"["<<currentdim<<"]";
   if(node->idxRecords.size() <= BSZ ){
     return;
   }
@@ -27,11 +53,11 @@ void CStigTree :: createIndex(CStigNode* node, int currentdim){
   for(int i =0;i< toSort.size();i++){
     cout<<toSort[i].second<<" ";
   }*/
-  cout<<"[tS "<<currentdim;
+  //cout<<"[tS "<<currentdim;
   sort(toSort.begin(), toSort.end(), [](auto &left, auto &right) {
     return left.second < right.second;
   });
-  cout<<" tS] ";
+  //cout<<" tS] ";
   /*cout<<"\nnodes Sorted: \n";
   for(int i =0;i< toSort.size();i++){
     cout<<toSort[i].first<<"-"<<toSort[i].second<<" ";
