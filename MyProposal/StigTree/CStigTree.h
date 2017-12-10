@@ -12,7 +12,8 @@ public: //TODO pasar los atributos a private
   vector<CStigNode*> searchTree(CStigNode* node, int currentDim, vector<float> key); // buscar el conjunto donde puede estar
   string searchInLeaf(int idx); // buscar el registro en una hoja
   
-  vector<int> createInOrderArray();
+  void createInOrderArray(CStigNode* node, vector<int> &res);
    
   ~CStigTree(){};
 };
+

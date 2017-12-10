@@ -11,20 +11,28 @@ vector<Tpair> load (vector<int> idxRecords, int currentdim){
   cout<<"FileName "<<name<<endl;
   
   ifstream file(name);
-  //TODO: make pair del txt
-  
   vector<Tpair> res(0);
-  if(currentdim == 1){
-    res.push_back(make_pair(0,3.14));
-    res.push_back(make_pair(1,6.25));
-    res.push_back(make_pair(2,0.24));
-    res.push_back(make_pair(3,63.25));
-    res.push_back(make_pair(4,0.0024));
-  }else{
-    for(int i = 0;i<  idxRecords.size();i++ ){
-      res.push_back(make_pair(idxRecords[i],0.011));
-    }  
-  }
+	string line;
+  int idx;
+  float value;
+  string::size_type sz;
+  std::vector<int>::iterator it;
+  int i =0;
+  while(getline(file,line)){
+      //idx=stoi(line.substr(0,line.find(",")));
+      if(currentdim == 1){
+        value = stof(line.substr(line.find(",")+1,line.size()-1),&sz);
+        res.push_back(make_pair(i,value));
+      }else{
+        
+      it = find (idxRecords.begin(), idxRecords.end(), i);
+        if(it != idxRecords.end()){
+          value = stof(line.substr(line.find(",")+1,line.size()-1),&sz);
+          res.push_back(make_pair(i,value));      
+        }
+      }
+      i++;      
+    }
   
   return res;
 }
@@ -36,3 +44,36 @@ vector<int> getFirst(vector<Tpair> pairs){
   }
   return res;
 }
+
+/*
+inline int byteToInt(const char* memblock) {
+    int result =
+        (unsigned char)(memblock[3]) |
+        (unsigned char)(memblock[2]) << 8  |
+        (unsigned char)(memblock[1]) << 16 |
+        (unsigned char)(memblock[0]) << 24;
+    return result;
+}
+
+// Lee un entero desde un archivo.
+int TableManagement:: readInt(const int& start) {
+    char *memblock = new char[4];
+    file.seekg(start, ios::beg);
+    file.read(memblock, 4);
+    int result = byteToInt(memblock);
+    delete[] memblock;
+    return result;
+}
+
+// Lee un string desde un archivo.
+string TableManagement::readString(const int& start, const int& size) {
+    char *memblock = new char[size];
+    file.seekg(start, ios::beg);
+    file.read(memblock,size);
+
+    string result = byteToString(memblock, size);
+    delete[] memblock;
+    return result;
+}
+
+*/
