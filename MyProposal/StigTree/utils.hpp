@@ -6,7 +6,6 @@ using namespace std;
 
 using Point = vector<string>;
 
-
 inline vector<string> splitStr(const string &str, const char delim) {
   // Splits a string, using delim as the delimiter and return
   // a vector with the result.
