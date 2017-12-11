@@ -1,6 +1,6 @@
 #include "CStigNode.h"
 #include <set>
-using Point = vector<string>;
+using Point = vector<float>;
 #define Tpair pair<int, float>
 #define TpairStig pair<CStigNode*,int>
 
@@ -15,7 +15,7 @@ public: //TODO pasar los atributos a private
   void createIndex(CStigNode* node, int currentdim);
   
   void searchTree(CStigNode* node, int currentDim, vector<float> key,set<TpairStig>& res);
-  bool searchInLeaf(set<TpairStig> res, vector<float> key, vector<string>& regFound);
+  bool searchInLeaf(set<TpairStig> res, vector<float> key, vector<float>& regFound);
   
   bool findReg(vector<float> key);
   

@@ -14,24 +14,23 @@ using namespace std;
 CStigTree ::  CStigTree(int iDimensions){
   root = nullptr;
   dimensions = iDimensions;
-  //string name = "files/10regs/Year.txt";
-  string name = "files/YearPredictionMSD.txt";
+  string name = "files/Year.txt";
+  //string name = "files/YearPredictionMSD.txt";
   ifstream file(name);
   allRegisters = readCSV(file, false);
 }
 
 vector<Tpair> CStigTree :: load (vector<int> idxRecords, int currentDim){
   vector<Tpair> res(0);
-  string::size_type sz;
   float value;
   if(currentDim == 0){
     for(int i =0;i<allRegisters.size();i++){
-        value = stof(allRegisters[i][0],&sz);
+        value =allRegisters[i][0];
         res.push_back(make_pair(i,value));
     } 
   }else{
     for(int k =0;k<idxRecords.size();k++){
-      value = stof(allRegisters[idxRecords[k]][currentDim],&sz);
+      value = allRegisters[idxRecords[k]][currentDim];
       res.push_back(make_pair(idxRecords[k],value));
     }
   }
@@ -41,11 +40,10 @@ vector<Tpair> CStigTree :: load (vector<int> idxRecords, int currentDim){
   
 void CStigTree :: createIndex(CStigNode* node, int currentDim){
   int d = currentDim%dimensions;
-  string::size_type sz;
   vector<float> aaa;
   if(node->idxRecords.size() <= BSZ ){
       for(int i =0;i< node->idxRecords.size();i++){
-          aaa.push_back(stof(allRegisters[node->idxRecords[i]][d],&sz));
+          aaa.push_back(allRegisters[node->idxRecords[i]][d]);
       }
       auto result = std::minmax_element(aaa.begin(),aaa.end());
       node->BBoxMin = aaa[result.first - aaa.begin()];
@@ -91,15 +89,14 @@ void CStigTree :: searchTree(CStigNode* node, int currentDim, vector<float> key,
    }
 }
 
-bool CStigTree :: searchInLeaf(set<TpairStig> res, vector<float> key, vector<string>& regFound){
+bool CStigTree :: searchInLeaf(set<TpairStig> res, vector<float> key, vector<float>& regFound){
   std::set<TpairStig>::iterator it;
-  string::size_type sz;
   for (it=res.begin(); it!=res.end(); ++it){
     for(int j =0;j<(*it).first->idxRecords.size();j++){
-        float tmp = stof(allRegisters[(*it).first->idxRecords[j]][(*it).second],&sz);
+        float tmp = allRegisters[(*it).first->idxRecords[j]][(*it).second];
         if(key[(*it).second] == tmp){
           regFound = allRegisters[(*it).first->idxRecords[j]]; 
-          return true; 
+          return (key == allRegisters[(*it).first->idxRecords[j]]); 
         }
     }
   }
@@ -110,7 +107,7 @@ bool CStigTree :: findReg(vector<float> key){
   set<TpairStig> res1;
   std::set<TpairStig>::iterator it;
   searchTree(root, 0,key,res1);
-  vector<string> finalAns;
+  vector<float> finalAns;
   return searchInLeaf(res1,key,finalAns);  
 }
 
