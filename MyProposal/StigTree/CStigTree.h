@@ -15,7 +15,6 @@ public: //TODO pasar los atributos a private
   void createIndex(CStigNode* node, int currentdim);
   
   void searchTree(CStigNode* node, int currentDim, vector<float> key,set<TpairStig>& res);
-   // buscar el conjunto donde puede estar
   bool searchInLeaf(set<TpairStig> res, vector<float> key, vector<string>& regFound);
   
   bool findReg(vector<float> key);

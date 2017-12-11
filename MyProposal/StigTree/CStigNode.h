@@ -6,7 +6,6 @@ using namespace std;
 
 class CStigNode {
 public: //TODO pasar los atributos a private
-  //STIG/Tpair idxData;
   float idxData;
   float BBoxMin;
   float BBoxMax;
@@ -14,7 +13,6 @@ public: //TODO pasar los atributos a private
   vector<int> idxRecords;
 
   CStigNode(){
-   //STIG/idxData = make_pair(-1,0.0f);
     idxData = 0.0f;
     BBoxMin = 0.0f;
     BBoxMax = 0.0f;
@@ -23,7 +21,6 @@ public: //TODO pasar los atributos a private
   }
   
   CStigNode(const vector<int> &data){
-    //STIG/idxData = make_pair(-1,0.0f);
     idxData = 0.0f;
     BBoxMin = 0.0f;
     BBoxMax = 0.0f;
