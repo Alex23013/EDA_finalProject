@@ -1,9 +1,9 @@
 #include <iostream>
 #include <vector>
+#include <set>
 #include "CStigTree.h"
 
 using namespace std;
-
 
 int main() {
 
@@ -24,9 +24,9 @@ for(int i =0;i< res.size();i++){
   cout<<res[i]<<" ";
 }
 cout<<endl;
-vector<CStigNode*> res1(0);
+
 vector<float> key = {2001,49.75468,33.99581,56.73846,2.89581};
-treeEx.searchTree(treeEx.root, 0,key,res1);
+treeEx.findReg(key);
 
 return 0;
 }

@@ -1,6 +1,6 @@
 #include <utility> 
 #include <fstream>
-
+#include<set>
 #include <algorithm> 
 #include "CStigTree.h"
 #include "extend.h"
@@ -10,6 +10,7 @@ using namespace std;
 
 #define BSZ 2//100
 #define Tpair pair<int, float>
+#define TpairStig pair<CStigNode*,int>
 
 CStigTree ::  CStigTree(int iDimensions){
   root = nullptr;
@@ -102,7 +103,7 @@ void CStigTree :: createIndex(CStigNode* node, int currentdim){
   createIndex(node->childs[1],currentdim+1);
 }
 
-void CStigTree :: searchTree(CStigNode* node, int currentDim, vector<float> key, vector<CStigNode*>& res){
+void CStigTree :: searchTree(CStigNode* node, int currentDim, vector<float> key, set<TpairStig>& res){
   float searchedKey = key[currentDim];
   //cout<<"searchedKey "<<searchedKey<<endl;
   if(node->idxRecords.size() != 0){
@@ -111,7 +112,7 @@ void CStigTree :: searchTree(CStigNode* node, int currentDim, vector<float> key,
     if(node->inBox(searchedKey)){
         //cout<<" ans";
         cout<<"["<<node->BBoxMin<<"__"<<node->BBoxMax<<"]";
-      res.push_back(node);
+      res.insert(make_pair(node,currentDim));
       
     }
     return;
@@ -122,6 +123,41 @@ void CStigTree :: searchTree(CStigNode* node, int currentDim, vector<float> key,
    if(searchedKey >= node->idxData) {
       searchTree(node->childs[1],currentDim+1,key,res);
    }
+}
+
+bool CStigTree :: searchInLeaf(set<TpairStig> res, vector<float> key, vector<string>& regFound){
+  std::set<TpairStig>::iterator it;
+  string::size_type sz;
+  for (it=res.begin(); it!=res.end(); ++it){
+    for(int j =0;j<(*it).first->idxRecords.size();j++){
+        float tmp = stof(allRegisters[(*it).first->idxRecords[j]][(*it).second],&sz);
+        if(key[(*it).second] == tmp){
+          regFound = allRegisters[(*it).first->idxRecords[j]]; 
+          return true; 
+        }
+    }
+  }
+  return false;
+}
+
+bool CStigTree :: findReg(vector<float> key){
+  set<TpairStig> res1;
+  std::set<TpairStig>::iterator it;
+  searchTree(root, 0,key,res1);
+  cout<<"posibles leaf\n";
+  for (it=res1.begin(); it!=res1.end(); ++it){
+    for(int j =0;j<(*it).first->idxRecords.size();j++){
+      cout<<(*it).first->idxRecords[j]<<"("<<(*it).second<<") ";
+      }
+    cout<<"\n";
+  }
+
+  vector<string> finalAns;
+  bool is =  searchInLeaf(res1,key,finalAns);
+    for(int i =0;i< finalAns.size();i++){
+    cout<<finalAns[i]<<" ";
+    }
+  return is;  
 }
 
 void CStigTree :: createInOrderArray(CStigNode* node,vector<int>& res){
