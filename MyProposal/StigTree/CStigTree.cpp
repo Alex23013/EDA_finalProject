@@ -2,6 +2,7 @@
 #include <fstream>
 #include<set>
 #include <algorithm> 
+#include<thread>
 #include "CStigTree.h"
 #include "extend.h"
 #include <iostream>
@@ -14,7 +15,7 @@ using namespace std;
 CStigTree ::  CStigTree(int iDimensions){
   root = nullptr;
   dimensions = iDimensions;
-  string name = "files/Year.txt";
+  string name = "files/Year100000.txt";
   //string name = "files/YearPredictionMSD.txt";
   ifstream file(name);
   allRegisters = readCSV(file, false);
@@ -117,3 +118,39 @@ void CStigTree :: createInOrderArray(CStigNode* node,vector<int>& res){
   res.insert(res.end(), node->idxRecords.begin(), node->idxRecords.end());
   createInOrderArray(node->childs[1],res);
 }
+
+/*
+vector<float> CStigTree :: searchTreeP(vector<int> toSearch,vector<float> key, int total){
+  size_t numberThreads = std::thread::hardware_concurrency();
+  size_t idxByThread =
+      total / numberThreads + (total % numberThreads ? 1 : 0);
+  std::vector<std::thread> thds;
+  vector<vector<bool>> ress(numberThreads);
+  for (size_t i = 0; i < numberThreads; i++) {
+    vector<bool> tm(idxByThread,false);
+    thds.emplace_back(CStigTree :: thr_searchP, this,
+                         toSearch,(i*idxByThread),((i+1)*idxByThread)-1,
+                         key,tm);
+    ress[i]=tm;                
+  }
+
+  for (auto &thread : thds)
+    thread.join();
+    
+  
+  int pos_found =0; //TODO: ver la posicion del true
+  return  allRegisters[pos_found];
+}
+
+
+/*GPU search inOrderArray*/
+/*void CStigTree :: thr_searchP(vector<int> toSearch, const size_t start, const size_t end, vector<float> key, vector<bool>& res){
+ vector<float> tmp;
+ for (size_t i = start; i < end; i++) {
+      if(key == allRegisters[toSearch[i]] )
+        {res[i]=true;}
+      else
+        {res[i]=false;}
+ }
+}
+*/
