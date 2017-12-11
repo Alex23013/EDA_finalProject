@@ -16,11 +16,12 @@ CStigTree ::  CStigTree(int iDimensions){
   root = nullptr;
   dimensions = iDimensions;
   string name = "files/Year100000.txt";
-  //string name = "files/YearPredictionMSD.txt";
+  //string name = "files/YearPredictionMSD.txt"; // subset 0.5 Millon
   ifstream file(name);
   allRegisters = readCSV(file, false);
 }
 
+/*Carga una lista de pair<indice,dato> en la dimension requerida*/
 vector<Tpair> CStigTree :: load (vector<int> idxRecords, int currentDim){
   vector<Tpair> res(0);
   float value;
@@ -40,12 +41,14 @@ vector<Tpair> CStigTree :: load (vector<int> idxRecords, int currentDim){
 
   
 void CStigTree :: createIndex(CStigNode* node, int currentDim){
-  int d = currentDim%dimensions;
+  int d = currentDim%dimensions; // para no salir de las dimensiones 
   vector<float> aaa;
-  if(node->idxRecords.size() <= BSZ ){
+  if(node->idxRecords.size() <= BSZ ){ 
+  // si ya llegamos a la cantidad min por nodo hoja
       for(int i =0;i< node->idxRecords.size();i++){
           aaa.push_back(allRegisters[node->idxRecords[i]][d]);
       }
+      //calculando el Bounding Box en la currentDimension
       auto result = std::minmax_element(aaa.begin(),aaa.end());
       node->BBoxMin = aaa[result.first - aaa.begin()];
       node->BBoxMax = aaa[result.second - aaa.begin()];
@@ -53,13 +56,17 @@ void CStigTree :: createIndex(CStigNode* node, int currentDim){
   }
   
   vector<Tpair> toSort = load(node->idxRecords,d);
+  //sort en la currentDimension
   sort(toSort.begin(), toSort.end(), [](auto &left, auto &right) {
     return left.second < right.second;
   });
   int posMedian = toSort.size()/2;
+  //set el punto mediano o eje de corte en la currentDimension
   node->idxData = toSort[posMedian].second;
-    vector<Tpair> v1(toSort.begin(),toSort.begin() + posMedian);
-  vector<Tpair> v2(toSort.begin() + posMedian,toSort.end()); ////STIG/ median+1
+  // asignando las dos mitades a los hijos del nodo actual
+  vector<Tpair> v1(toSort.begin(),toSort.begin() + posMedian);
+  vector<Tpair> v2(toSort.begin() + posMedian,toSort.end()); 
+  //asignando solo los indices
   vector<int> idxleft = getFirst(v1);
   vector<int> idxright = getFirst(v2);
   node->idxRecords.clear();
@@ -73,23 +80,29 @@ void CStigTree :: createIndex(CStigNode* node, int currentDim){
 void CStigTree :: searchTree(CStigNode* node, int currentDim, vector<float> key, set<TpairStig>& res){
   int d = currentDim%dimensions;
   float searchedKey = key[d];
-  
+  // si idxRecords.size() != 0 quiere decir que es un nodo hoja 
+  //por lo tanto  hay que buscar en el Bounding Box
   if(node->idxRecords.size() != 0){
     if(node->inBox(searchedKey)){
-      //cout<<" ans";
-      //cout<<"["<<node->BBoxMin<<"__"<<node->BBoxMax<<"]";
+      //Y si el valor buscado en la currentDim esta dentro del Bounding Box
+      //lo ingresamos al conjunto de posibles hojas  donde esta
       res.insert(make_pair(node,d));
     }
     return;
   }
+    // si no es nodo hoja
    if (searchedKey <= node->idxData){
+      // si es <= que el eje de corte se busca en el child left
       searchTree(node->childs[0],d+1,key,res);
    }
    if(searchedKey >= node->idxData) {
+      // si es >= que el eje de corte se busca en el child right
       searchTree(node->childs[1],d+1,key,res);
    }
 }
 
+
+//Buscar en todo los registros que contiene los nodos hoja encontrados en SearchTree
 bool CStigTree :: searchInLeaf(set<TpairStig> res, vector<float> key, vector<float>& regFound){
   std::set<TpairStig>::iterator it;
   for (it=res.begin(); it!=res.end(); ++it){
@@ -104,6 +117,7 @@ bool CStigTree :: searchInLeaf(set<TpairStig> res, vector<float> key, vector<flo
   return false;
 }
 
+//Encontrar un dato
 bool CStigTree :: findReg(vector<float> key){
   set<TpairStig> res1;
   std::set<TpairStig>::iterator it;
@@ -112,6 +126,7 @@ bool CStigTree :: findReg(vector<float> key){
   return searchInLeaf(res1,key,finalAns);  
 }
 
+//recorrido en inorden para las busquedas paralelas
 void CStigTree :: createInOrderArray(CStigNode* node,vector<int>& res){
   if(!node){return;}
   createInOrderArray(node->childs[0],res);
@@ -120,6 +135,7 @@ void CStigTree :: createInOrderArray(CStigNode* node,vector<int>& res){
 }
 
 /*
+//Busqueda Paralela
 vector<float> CStigTree :: searchTreeP(vector<int> toSearch,vector<float> key, int total){
   size_t numberThreads = std::thread::hardware_concurrency();
   size_t idxByThread =

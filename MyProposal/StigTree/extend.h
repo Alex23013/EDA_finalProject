@@ -51,6 +51,7 @@ inline Point lineToPoint(const std::string &str, const char delim,
   return ret;
 }
 
+/*funcion extraida de la estructura con la que se comparó*/
 inline std::vector<Point> readCSV(std::istream &file,
                                   const bool hasHeader = false) {
   char delim = ',';
